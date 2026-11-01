@@ -3,36 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111827">
-  <meta name="description"
-        content="Orbit: a personal focus timer and study task dashboard.">
-  <title>Orbit — Your Focus Desk</title>
+  <meta name="theme-color" content="#101624">
+  <meta name="description" content="Organize tasks, track focus sessions, and build steady study habits with Orbit.">
+  <title>Orbit — Focus Desk</title>
 
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0b1120;
-      --card: #141e32;
-      --input: #0e1729;
-      --text: #eef2ff;
-      --muted: #a4b0c8;
-      --line: #2a3650;
-      --accent: #b8f36c;
-      --accent-text: #17260b;
-      --shadow: 0 20px 60px #0003;
+      --bg: #101624;
+      --card: #192235;
+      --input: #111a2b;
+      --text: #f0f4ff;
+      --muted: #a6b2ca;
+      --line: #303c54;
+      --accent: #bcf278;
+      --ink: #20300d;
+      --danger: #ffb3b3;
     }
 
     body.light {
       color-scheme: light;
-      --bg: #f1f4eb;
+      --bg: #f1f5ec;
       --card: #ffffff;
-      --input: #f4f6f0;
-      --text: #19251d;
-      --muted: #617064;
-      --line: #dce3d6;
-      --accent: #c0ee82;
-      --accent-text: #17260b;
-      --shadow: 0 20px 60px #2136190a;
+      --input: #f5f7f1;
+      --text: #1e2b22;
+      --muted: #607164;
+      --line: #d8e1d3;
+      --accent: #bce785;
+      --ink: #20300d;
+      --danger: #a32929;
     }
 
     * { box-sizing: border-box; }
@@ -41,229 +40,119 @@
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      transition: background .2s, color .2s;
+      font-family: system-ui, sans-serif;
     }
 
-    button, input { font: inherit; }
+    button, input, select { font: inherit; }
 
-    button {
-      cursor: pointer;
+    button, input, select {
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 12px 18px;
       background: var(--input);
       color: var(--text);
-      transition: transform .15s, background .15s;
+      padding: 12px;
     }
 
-    button:hover { transform: translateY(-2px); }
+    button { cursor: pointer; }
+    button:hover { filter: brightness(1.12); }
+    input, select { min-width: 0; }
+    input::placeholder { color: var(--muted); }
 
-    button:focus-visible, input:focus-visible {
+    :focus-visible {
       outline: 3px solid var(--accent);
-      outline-offset: 4px;
+      outline-offset: 3px;
     }
 
     .primary {
       background: var(--accent);
-      color: var(--accent-text);
+      color: var(--ink);
       border-color: var(--accent);
       font-weight: 750;
     }
 
-    .shell { max-width: 1120px; margin: auto; padding: 28px; }
+    .shell { max-width: 1150px; margin: auto; padding: 28px; }
+    header, .row, .heading { display: flex; align-items: center; gap: 12px; }
+    header, .heading { justify-content: space-between; }
+    .brand { font-size: 26px; font-weight: 850; letter-spacing: -1px; }
+    .brand span { color: var(--accent); }
 
-    header, .brand, .heading, .actions, .task, .task-main {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .intro { padding: 48px 0 24px; }
+    .eyebrow { color: var(--muted); font-size: 12px; letter-spacing: 3px; }
+    h1 { font-size: clamp(36px, 6vw, 62px); letter-spacing: -2px; margin: 14px 0; line-height: 1.1; }
+    h2 { margin: 0; font-size: 19px; }
+    p { color: var(--muted); line-height: 1.6; }
 
-    header { justify-content: space-between; }
-
-    .brand { font-size: 23px; font-weight: 850; letter-spacing: -1px; }
-
-    .logo {
-      width: 38px;
-      height: 38px;
+    .stats {
       display: grid;
-      place-items: center;
-      border-radius: 50%;
-      border: 2px solid var(--accent);
-      color: var(--accent);
-      font-size: 25px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 10px 0 24px;
     }
 
-    .intro { padding: 62px 0 32px; }
-
-    .eyebrow {
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    body.light .eyebrow { color: #497320; }
-
-    h1 {
-      font-size: clamp(36px, 6vw, 64px);
-      line-height: 1.08;
-      letter-spacing: -3px;
-      margin: 14px 0;
-    }
-
-    p { color: var(--muted); line-height: 1.7; }
-
-    .layout {
-      display: grid;
-      grid-template-columns: .95fr 1.2fr;
-      gap: 24px;
-    }
-
-    .card {
+    .stat, .card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 28px;
-      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 24px;
     }
 
-    .heading { justify-content: space-between; margin-bottom: 24px; }
+    .stat strong { display: block; font-size: 30px; margin-bottom: 4px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .layout { display: grid; grid-template-columns: .9fr 1.25fr; gap: 24px; }
+    .heading { margin-bottom: 24px; }
 
-    h2 { font-size: 19px; margin: 0; letter-spacing: -.5px; }
-
-    .tag {
+    .badge {
+      font-size: 12px;
+      color: var(--muted);
       padding: 6px 10px;
       border: 1px solid var(--line);
-      border-radius: 20px;
-      color: var(--muted);
-      font-size: 12px;
+      border-radius: 30px;
     }
 
-    .modes { display: flex; gap: 10px; justify-content: center; }
-
-    .modes button { font-size: 13px; padding: 9px 14px; }
-
-    .modes button[aria-pressed="true"] {
-      background: var(--accent);
-      color: var(--accent-text);
-      border-color: var(--accent);
-    }
+    .modes { justify-content: center; }
+    [aria-pressed="true"] { background: var(--accent); color: var(--ink); }
 
     .clock {
       width: min(260px, 100%);
       aspect-ratio: 1;
-      margin: 30px auto;
       border: 8px solid var(--line);
       border-top-color: var(--accent);
       border-radius: 50%;
+      margin: 28px auto;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
     }
 
-    #time {
-      font-size: clamp(45px, 8vw, 62px);
-      font-weight: 800;
-      letter-spacing: -3px;
-      font-variant-numeric: tabular-nums;
-    }
+    #time { font-size: 58px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -3px; }
+    #timer-status { color: var(--muted); font-size: 13px; margin-top: 8px; }
+    .center { justify-content: center; }
+    .custom { margin-top: 24px; justify-content: center; flex-wrap: wrap; }
+    .custom label { font-size: 13px; color: var(--muted); }
+    .custom input { width: 76px; }
 
-    #timer-status { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    #task-form { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+    .filters { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 14px; }
 
-    .actions { justify-content: center; }
+    ul { list-style: none; padding: 0; margin: 20px 0; }
+    .task { display: flex; align-items: center; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .task label { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .task-text { overflow-wrap: anywhere; }
+    .task input { width: 19px; height: 19px; accent-color: #8bbd4e; flex-shrink: 0; }
+    .done .task-text { color: var(--muted); text-decoration: line-through; }
+    .priority { font-size: 11px; color: var(--muted); }
+    .priority.high { color: var(--danger); }
+    .delete { padding: 5px 10px; font-size: 20px; }
 
-    .timer-note { text-align: center; font-size: 13px; margin-bottom: 0; }
+    .empty { padding: 30px 10px; text-align: center; color: var(--muted); }
+    .progress-label { justify-content: space-between; font-size: 13px; color: var(--muted); }
 
-    form { display: flex; gap: 10px; }
-
-    input[type="text"] {
-      flex: 1;
-      min-width: 0;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--input);
-      color: var(--text);
-      padding: 14px;
-    }
-
-    input::placeholder { color: var(--muted); }
-
-    ul { padding: 0; list-style: none; margin: 22px 0; }
-
-    .task {
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .task-main { min-width: 0; flex: 1; }
-
-    .task-main span { overflow-wrap: anywhere; }
-
-    input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
-      accent-color: #87bc48;
-    }
-
-    .task.done .task-main span {
-      text-decoration: line-through;
-      color: var(--muted);
-    }
-
-    .delete { padding: 6px 10px; color: var(--muted); }
-
-    .empty {
-      text-align: center;
-      padding: 35px 12px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .progress-label {
-      display: flex;
-      justify-content: space-between;
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    progress {
-      appearance: none;
-      width: 100%;
-      height: 9px;
-      border: 0;
-      border-radius: 20px;
-      overflow: hidden;
-      background: var(--line);
-    }
-
-    progress::-webkit-progress-bar { background: var(--line); }
-    progress::-webkit-progress-value { background: var(--accent); }
-    progress::-moz-progress-bar { background: var(--accent); }
-
-    .tip {
-      margin-top: 24px;
-      padding: 20px 24px;
-      border: 1px dashed var(--line);
-      border-radius: 16px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .tip strong { color: var(--text); }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 12px;
-      padding: 32px 0 8px;
-    }
+    progress { width: 100%; height: 9px; margin: 12px 0 20px; accent-color: #8bbd4e; }
+    .tools { flex-wrap: wrap; }
+    .tools button { padding: 9px 12px; font-size: 12px; }
+    #notice { min-height: 24px; font-size: 13px; }
+    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 30px 0 6px; }
 
     .sr-only {
       position: absolute;
@@ -274,16 +163,20 @@
       white-space: nowrap;
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 800px) {
       .layout { grid-template-columns: 1fr; }
-      .shell { padding: 20px; }
-      .intro { padding-top: 42px; }
-      .card { padding: 22px; }
-      h1 { letter-spacing: -2px; }
+      .shell { padding: 18px; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
+    @media (max-width: 480px) {
+      .stat { padding: 16px 12px; }
+      .stat strong { font-size: 25px; }
+      .stat span { font-size: 11px; }
+      .card { padding: 20px; }
+      #task-form { grid-template-columns: 1fr auto; }
+      #task-input { grid-column: 1 / -1; }
+      .filters { grid-template-columns: 1fr; }
+      .task { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -291,31 +184,33 @@
 <body>
   <div class="shell">
     <header>
-      <div class="brand"><span class="logo" aria-hidden="true">◉</span> orbit</div>
+      <div class="brand"><span>◉</span> orbit</div>
       <button id="theme" type="button">Light theme</button>
     </header>
 
     <main>
       <section class="intro">
-        <div class="eyebrow">Less noise. More progress.</div>
-        <h1>Make room for<br>your next big idea.</h1>
-        <p>Your little corner of the internet for focused work and small wins.</p>
+        <div class="eyebrow">YOUR PERSONAL FOCUS SPACE</div>
+        <h1>Small steps.<br>Meaningful progress.</h1>
+        <p id="date"></p>
+      </section>
+
+      <section class="stats" aria-label="Dashboard statistics">
+        <div class="stat"><strong id="total">0</strong><span>Total tasks</span></div>
+        <div class="stat"><strong id="completed">0</strong><span>Completed tasks</span></div>
+        <div class="stat"><strong id="sessions">0</strong><span>Focus sessions · all time</span></div>
       </section>
 
       <div class="layout">
-        <section class="card" aria-labelledby="focus-heading">
+        <section class="card" aria-labelledby="focus-title">
           <div class="heading">
-            <h2 id="focus-heading">Focus station</h2>
-            <span class="tag">One thing at a time</span>
+            <h2 id="focus-title">Focus station</h2>
+            <span class="badge">Stay with one thing</span>
           </div>
 
-          <div class="modes" aria-label="Timer mode">
-            <button type="button" data-mode="focus" aria-pressed="true">
-              Focus · 25m
-            </button>
-            <button type="button" data-mode="break" aria-pressed="false">
-              Break · 5m
-            </button>
+          <div class="row modes">
+            <button type="button" data-mode="focus" aria-pressed="true">Focus</button>
+            <button type="button" data-mode="break" aria-pressed="false">Break</button>
           </div>
 
           <div class="clock">
@@ -323,115 +218,227 @@
             <div id="timer-status" role="status">Ready when you are</div>
           </div>
 
-          <div class="actions">
+          <div class="row center">
             <button id="start" class="primary" type="button">Start focus</button>
             <button id="reset" type="button">Reset</button>
           </div>
 
-          <p class="timer-note">A little focus goes a long way.</p>
+          <form id="duration-form" class="row custom">
+            <label for="minutes">Session minutes</label>
+            <input id="minutes" type="number" min="1" max="180" step="1" value="25" required>
+            <button type="submit">Apply</button>
+          </form>
         </section>
 
-        <section class="card" aria-labelledby="tasks-heading">
+        <section class="card" aria-labelledby="tasks-title">
           <div class="heading">
-            <h2 id="tasks-heading">Your next moves</h2>
-            <span id="task-count" class="tag">0 tasks</span>
+            <h2 id="tasks-title">Your next moves</h2>
+            <span class="badge" id="remaining">0 remaining</span>
           </div>
 
           <form id="task-form">
             <label class="sr-only" for="task-input">New task</label>
             <input id="task-input" type="text" maxlength="160"
-                   placeholder="What do you want to accomplish?"
-                   autocomplete="off" required>
-            <button class="primary" type="submit">Add</button>
+                   placeholder="Add a task worth finishing…" required>
+
+            <label class="sr-only" for="priority">Task priority</label>
+            <select id="priority">
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+            </select>
+
+            <button type="submit" class="primary">Add task</button>
           </form>
+
+          <div class="filters">
+            <label class="sr-only" for="search">Search tasks</label>
+            <input id="search" type="search" placeholder="Search tasks…">
+
+            <label class="sr-only" for="filter">Filter tasks</label>
+            <select id="filter">
+              <option value="all">All tasks</option>
+              <option value="active">Active</option>
+              <option value="done">Completed</option>
+              <option value="high">High priority</option>
+            </select>
+          </div>
 
           <ul id="tasks"></ul>
 
-          <div class="progress-label">
-            <span>Completion</span>
+          <div class="row progress-label">
+            <span>Task completion</span>
             <span id="progress-text" aria-live="polite">0 of 0</span>
           </div>
-          <progress id="progress" max="100" value="0"
-                    aria-label="Task completion"></progress>
+          <progress id="progress" max="100" value="0" aria-label="Task completion"></progress>
 
-          <p id="storage-status" role="status" class="timer-note">
-            Tasks are saved in this browser.
-          </p>
+          <div class="row tools">
+            <button id="clear" type="button">Clear completed</button>
+            <button id="export" type="button">Export tasks</button>
+            <button id="import" type="button">Import tasks</button>
+            <input id="file" type="file" accept=".json,application/json" hidden>
+          </div>
+
+          <p id="notice" role="status">Your progress is saved in this browser.</p>
         </section>
       </div>
-
-      <aside class="tip">
-        <strong>A small experiment:</strong>
-        Choose one task, silence your notifications, and give it 25 minutes.
-        You only need to begin.
-      </aside>
     </main>
 
-    <footer>ORBIT / Built for steady progress.</footer>
+    <footer>ORBIT — Make time for what matters.</footer>
   </div>
 
   <script>
     const $ = selector => document.querySelector(selector);
-    const TASK_KEY = "orbit.tasks.v1";
-    const THEME_KEY = "orbit.theme.v1";
+    const KEY = "orbit.dashboard.v2";
+    const OLD_TASK_KEY = "orbit.tasks.v1";
+    let storageAvailable = true;
 
-    let tasks = [];
+    const state = {
+      tasks: [],
+      sessions: 0,
+      theme: "dark",
+      durations: { focus: 1500, break: 300 }
+    };
 
-    function saveTasks() {
+    function validTask(task) {
+      return task &&
+        typeof task.id === "string" &&
+        typeof task.text === "string" &&
+        task.text.trim().length > 0 &&
+        task.text.length <= 160 &&
+        typeof task.done === "boolean" &&
+        ["normal", "high"].includes(task.priority);
+    }
+
+    function normalizeTasks(tasks) {
+      const seen = new Set();
+      return tasks.map(task => {
+        let id = task.id;
+        while (seen.has(id)) id = makeId();
+        seen.add(id);
+        return { id, text: task.text.trim(), done: task.done, priority: task.priority };
+      });
+    }
+
+    function makeId() {
+      return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+
+    function notify(message) {
+      $("#notice").textContent = message;
+    }
+
+    function save() {
       try {
-        localStorage.setItem(TASK_KEY, JSON.stringify(tasks));
-        $("#storage-status").textContent = "Tasks are saved in this browser.";
+        localStorage.setItem(KEY, JSON.stringify(state));
+        storageAvailable = true;
+        return true;
       } catch {
-        $("#storage-status").textContent =
-          "Storage is unavailable. Tasks will last for this page session.";
+        storageAvailable = false;
+        notify("Browser storage is unavailable or full. Export tasks to keep a copy.");
+        return false;
       }
     }
 
     try {
-      const saved = JSON.parse(localStorage.getItem(TASK_KEY) || "[]");
-      if (Array.isArray(saved)) {
-        tasks = saved
-          .filter(task =>
-            task && typeof task.id === "string" &&
-            typeof task.text === "string" &&
-            typeof task.done === "boolean"
-          )
-          .map(task => ({ ...task, text: task.text.slice(0, 160) }));
+      const raw = localStorage.getItem(KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved && typeof saved === "object") {
+          if (Array.isArray(saved.tasks)) {
+            state.tasks = normalizeTasks(saved.tasks.filter(validTask));
+          }
+          if (Number.isSafeInteger(saved.sessions) && saved.sessions >= 0) {
+            state.sessions = saved.sessions;
+          }
+          if (["dark", "light"].includes(saved.theme)) state.theme = saved.theme;
+          for (const mode of ["focus", "break"]) {
+            const seconds = saved.durations?.[mode];
+            if (Number.isInteger(seconds) && seconds >= 60 && seconds <= 10800) {
+              state.durations[mode] = seconds;
+            }
+          }
+        }
+      } else {
+        // Preserve tasks and theme from the original Orbit version.
+        const oldTasks = JSON.parse(localStorage.getItem(OLD_TASK_KEY) || "[]");
+        if (Array.isArray(oldTasks)) {
+          state.tasks = normalizeTasks(
+            oldTasks.map(task => ({ ...task, priority: "normal" })).filter(validTask)
+          );
+        }
+        if (localStorage.getItem("orbit.theme.v1") === "light") {
+          state.theme = "light";
+        }
       }
     } catch {
-      $("#storage-status").textContent =
-        "Saved tasks could not be loaded. You can start a new list.";
+      storageAvailable = false;
+      notify("Saved data could not be loaded. You can use this page and export your tasks.");
     }
 
-    function renderTasks() {
+    function applyTheme() {
+      document.body.classList.toggle("light", state.theme === "light");
+      $("#theme").textContent = state.theme === "light" ? "Dark theme" : "Light theme";
+    }
+
+    $("#theme").addEventListener("click", () => {
+      state.theme = state.theme === "light" ? "dark" : "light";
+      applyTheme();
+      save();
+    });
+
+    function render() {
+      const completed = state.tasks.filter(task => task.done).length;
+      $("#total").textContent = state.tasks.length;
+      $("#completed").textContent = completed;
+      $("#sessions").textContent = state.sessions;
+      $("#remaining").textContent = `${state.tasks.length - completed} remaining`;
+      $("#progress-text").textContent = `${completed} of ${state.tasks.length}`;
+      $("#progress").value = state.tasks.length ? completed / state.tasks.length * 100 : 0;
+
+      const query = $("#search").value.trim().toLowerCase();
+      const filter = $("#filter").value;
+      const visible = state.tasks.filter(task =>
+        task.text.toLowerCase().includes(query) &&
+        (filter === "all" ||
+          (filter === "active" && !task.done) ||
+          (filter === "done" && task.done) ||
+          (filter === "high" && task.priority === "high"))
+      );
+
       const list = $("#tasks");
       list.replaceChildren();
 
-      if (tasks.length === 0) {
+      if (!visible.length) {
         const empty = document.createElement("li");
         empty.className = "empty";
-        empty.textContent = "A fresh start. Add your first task above.";
+        empty.textContent = state.tasks.length
+          ? "No tasks match your search or filter."
+          : "A fresh start. Add your first task above.";
         list.append(empty);
       }
 
-      tasks.forEach(task => {
+      visible.forEach(task => {
         const item = document.createElement("li");
         item.className = `task${task.done ? " done" : ""}`;
 
         const label = document.createElement("label");
-        label.className = "task-main";
-
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.checked = task.done;
-        checkbox.addEventListener("change", () => {
-          task.done = checkbox.checked;
-          saveTasks();
-          renderTasks();
-        });
 
         const text = document.createElement("span");
+        text.className = "task-text";
         text.textContent = task.text;
+
+        checkbox.addEventListener("change", () => {
+          task.done = checkbox.checked;
+          save();
+          render();
+        });
+
+        const priority = document.createElement("span");
+        priority.className = `priority ${task.priority}`;
+        priority.textContent = task.priority === "high" ? "High" : "Normal";
 
         const remove = document.createElement("button");
         remove.type = "button";
@@ -439,77 +446,112 @@
         remove.textContent = "×";
         remove.setAttribute("aria-label", `Delete task: ${task.text}`);
         remove.addEventListener("click", () => {
-          tasks = tasks.filter(current => current.id !== task.id);
-          saveTasks();
-          renderTasks();
+          state.tasks = state.tasks.filter(entry => entry.id !== task.id);
+          save();
+          render();
           $("#task-input").focus();
         });
 
         label.append(checkbox, text);
-        item.append(label, remove);
+        item.append(label, priority, remove);
         list.append(item);
       });
-
-      const completed = tasks.filter(task => task.done).length;
-      $("#task-count").textContent =
-        `${tasks.length} task${tasks.length === 1 ? "" : "s"}`;
-      $("#progress-text").textContent = `${completed} of ${tasks.length}`;
-      $("#progress").value = tasks.length ? completed / tasks.length * 100 : 0;
     }
 
     $("#task-form").addEventListener("submit", event => {
       event.preventDefault();
-      const input = $("#task-input");
-      const text = input.value.trim();
+      const text = $("#task-input").value.trim();
       if (!text) return;
 
-      tasks.push({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      state.tasks.push({
+        id: makeId(),
         text,
-        done: false
+        done: false,
+        priority: $("#priority").value
       });
 
-      input.value = "";
-      saveTasks();
-      renderTasks();
-      input.focus();
+      $("#task-input").value = "";
+      save();
+      render();
+      $("#task-input").focus();
     });
 
-    function updateThemeButton() {
-      const light = document.body.classList.contains("light");
-      $("#theme").textContent = light ? "Dark theme" : "Light theme";
-      $("#theme").setAttribute("aria-label",
-        `Switch to ${light ? "dark" : "light"} theme`);
-    }
+    $("#search").addEventListener("input", render);
+    $("#filter").addEventListener("change", render);
 
-    try {
-      document.body.classList.toggle("light",
-        localStorage.getItem(THEME_KEY) === "light");
-    } catch {}
+    $("#clear").addEventListener("click", () => {
+      const count = state.tasks.filter(task => task.done).length;
+      if (!count) return notify("There are no completed tasks to clear.");
+      if (!confirm(`Remove ${count} completed task${count === 1 ? "" : "s"}?`)) return;
 
-    $("#theme").addEventListener("click", () => {
-      document.body.classList.toggle("light");
-      updateThemeButton();
+      state.tasks = state.tasks.filter(task => !task.done);
+      if (save()) notify("Completed tasks cleared.");
+      render();
+    });
+
+    $("#export").addEventListener("click", () => {
+      const backup = { version: 1, tasks: state.tasks };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: "application/json"
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "orbit-tasks.json";
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      notify("Task backup downloaded.");
+    });
+
+    $("#import").addEventListener("click", () => $("#file").click());
+
+    $("#file").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
       try {
-        localStorage.setItem(THEME_KEY,
-          document.body.classList.contains("light") ? "light" : "dark");
-      } catch {}
+        if (file.size > 2 * 1024 * 1024) throw new Error("File too large");
+        const backup = JSON.parse(await file.text());
+
+        if (
+          backup?.version !== 1 ||
+          !Array.isArray(backup.tasks) ||
+          backup.tasks.length > 5000 ||
+          !backup.tasks.every(validTask)
+        ) {
+          throw new Error("Invalid backup");
+        }
+
+        if (!confirm(`Replace your current tasks with ${backup.tasks.length} imported tasks?`)) {
+          return;
+        }
+
+        state.tasks = normalizeTasks(backup.tasks);
+        $("#search").value = "";
+        $("#filter").value = "all";
+        if (save()) notify("Tasks imported successfully.");
+        render();
+      } catch {
+        notify("Import failed. Choose an Orbit task backup under 2 MB with at most 5,000 tasks.");
+      } finally {
+        event.target.value = "";
+      }
     });
 
-    const durations = { focus: 25 * 60, break: 5 * 60 };
     let mode = "focus";
-    let remaining = durations[mode];
+    let remaining = state.durations[mode];
     let interval = null;
     let endAt = 0;
 
     function drawTimer() {
       const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
       const seconds = String(remaining % 60).padStart(2, "0");
-      const formatted = `${minutes}:${seconds}`;
-      $("#time").textContent = formatted;
+      $("#time").textContent = `${minutes}:${seconds}`;
       document.title = interval !== null
-        ? `${formatted} — Orbit`
-        : "Orbit — Your Focus Desk";
+        ? `${minutes}:${seconds} — Orbit`
+        : "Orbit — Focus Desk";
     }
 
     function stopTimer() {
@@ -517,19 +559,34 @@
       interval = null;
     }
 
-    function finishTimer() {
+    function resetTimer() {
       stopTimer();
-      remaining = 0;
+      remaining = state.durations[mode];
+      $("#minutes").value = state.durations[mode] / 60;
+      $("#timer-status").textContent = "Ready when you are";
+      $("#start").textContent = `Start ${mode}`;
       drawTimer();
-      $("#timer-status").textContent =
-        mode === "focus" ? "Session complete. Take a break!" : "Break complete!";
-      $("#start").textContent = "Start again";
     }
 
     function tick() {
       remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
-      if (remaining === 0) finishTimer();
-      else drawTimer();
+
+      if (remaining === 0) {
+        stopTimer();
+
+        if (mode === "focus") {
+          state.sessions++;
+          save();
+          render();
+        }
+
+        $("#timer-status").textContent = mode === "focus"
+          ? "Focus complete. Time for a break!"
+          : "Break complete. Ready to begin?";
+        $("#start").textContent = "Start again";
+      }
+
+      drawTimer();
     }
 
     $("#start").addEventListener("click", () => {
@@ -540,23 +597,16 @@
         $("#timer-status").textContent = "Paused";
         $("#start").textContent = "Resume";
       } else {
-        if (remaining === 0) remaining = durations[mode];
+        if (!remaining) remaining = state.durations[mode];
         endAt = Date.now() + remaining * 1000;
         interval = setInterval(tick, 250);
-        $("#timer-status").textContent =
-          mode === "focus" ? "You have got this." : "Breathe. Stretch. Recharge.";
+        $("#timer-status").textContent = mode === "focus"
+          ? "One task. Your full attention."
+          : "Breathe. Stretch. Recharge.";
         $("#start").textContent = "Pause";
       }
       drawTimer();
     });
-
-    function resetTimer() {
-      stopTimer();
-      remaining = durations[mode];
-      $("#timer-status").textContent = "Ready when you are";
-      $("#start").textContent = mode === "focus" ? "Start focus" : "Start break";
-      drawTimer();
-    }
 
     $("#reset").addEventListener("click", resetTimer);
 
@@ -570,13 +620,36 @@
       });
     });
 
+    $("#duration-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const minutes = Number($("#minutes").value);
+      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 180) return;
+
+      state.durations[mode] = minutes * 60;
+      resetTimer();
+      if (save()) notify(`${mode === "focus" ? "Focus" : "Break"} duration updated.`);
+    });
+
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden && interval !== null) tick();
     });
 
-    updateThemeButton();
-    renderTasks();
-    drawTimer();
+    function updateDate() {
+      $("#date").textContent = new Date().toLocaleDateString(undefined, {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    updateDate();
+    setInterval(updateDate, 60000);
+    applyTheme();
+    render();
+    resetTimer();
+
+    if (storageAvailable) save();
   </script>
 </body>
 </html>
