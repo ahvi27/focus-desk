@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <meta name="description"
+        content="Orbit: a personal focus timer and study task dashboard.">
+  <title>Orbit — Your Focus Desk</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1120;
+      --card: #141e32;
+      --input: #0e1729;
+      --text: #eef2ff;
+      --muted: #a4b0c8;
+      --line: #2a3650;
+      --accent: #b8f36c;
+      --accent-text: #17260b;
+      --shadow: 0 20px 60px #0003;
+    }
+
+    body.light {
+      color-scheme: light;
+      --bg: #f1f4eb;
+      --card: #ffffff;
+      --input: #f4f6f0;
+      --text: #19251d;
+      --muted: #617064;
+      --line: #dce3d6;
+      --accent: #c0ee82;
+      --accent-text: #17260b;
+      --shadow: 0 20px 60px #2136190a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background .2s, color .2s;
+    }
+
+    button, input { font: inherit; }
+
+    button {
+      cursor: pointer;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: var(--input);
+      color: var(--text);
+      transition: transform .15s, background .15s;
+    }
+
+    button:hover { transform: translateY(-2px); }
+
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
+      font-weight: 750;
+    }
+
+    .shell { max-width: 1120px; margin: auto; padding: 28px; }
+
+    header, .brand, .heading, .actions, .task, .task-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header { justify-content: space-between; }
+
+    .brand { font-size: 23px; font-weight: 850; letter-spacing: -1px; }
+
+    .logo {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-size: 25px;
+    }
+
+    .intro { padding: 62px 0 32px; }
+
+    .eyebrow {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    body.light .eyebrow { color: #497320; }
+
+    h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      line-height: 1.08;
+      letter-spacing: -3px;
+      margin: 14px 0;
+    }
+
+    p { color: var(--muted); line-height: 1.7; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: .95fr 1.2fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .heading { justify-content: space-between; margin-bottom: 24px; }
+
+    h2 { font-size: 19px; margin: 0; letter-spacing: -.5px; }
+
+    .tag {
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .modes { display: flex; gap: 10px; justify-content: center; }
+
+    .modes button { font-size: 13px; padding: 9px 14px; }
+
+    .modes button[aria-pressed="true"] {
+      background: var(--accent);
+      color: var(--accent-text);
+      border-color: var(--accent);
+    }
+
+    .clock {
+      width: min(260px, 100%);
+      aspect-ratio: 1;
+      margin: 30px auto;
+      border: 8px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    #time {
+      font-size: clamp(45px, 8vw, 62px);
+      font-weight: 800;
+      letter-spacing: -3px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #timer-status { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+    .actions { justify-content: center; }
+
+    .timer-note { text-align: center; font-size: 13px; margin-bottom: 0; }
+
+    form { display: flex; gap: 10px; }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--input);
+      color: var(--text);
+      padding: 14px;
+    }
+
+    input::placeholder { color: var(--muted); }
+
+    ul { padding: 0; list-style: none; margin: 22px 0; }
+
+    .task {
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .task-main { min-width: 0; flex: 1; }
+
+    .task-main span { overflow-wrap: anywhere; }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      accent-color: #87bc48;
+    }
+
+    .task.done .task-main span {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .delete { padding: 6px 10px; color: var(--muted); }
+
+    .empty {
+      text-align: center;
+      padding: 35px 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    progress {
+      appearance: none;
+      width: 100%;
+      height: 9px;
+      border: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--line);
+    }
+
+    progress::-webkit-progress-bar { background: var(--line); }
+    progress::-webkit-progress-value { background: var(--accent); }
+    progress::-moz-progress-bar { background: var(--accent); }
+
+    .tip {
+      margin-top: 24px;
+      padding: 20px 24px;
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .tip strong { color: var(--text); }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 32px 0 8px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      .shell { padding: 20px; }
+      .intro { padding-top: 42px; }
+      .card { padding: 22px; }
+      h1 { letter-spacing: -2px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="logo" aria-hidden="true">◉</span> orbit</div>
+      <button id="theme" type="button">Light theme</button>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="eyebrow">Less noise. More progress.</div>
+        <h1>Make room for<br>your next big idea.</h1>
+        <p>Your little corner of the internet for focused work and small wins.</p>
+      </section>
+
+      <div class="layout">
+        <section class="card" aria-labelledby="focus-heading">
+          <div class="heading">
+            <h2 id="focus-heading">Focus station</h2>
+            <span class="tag">One thing at a time</span>
+          </div>
+
+          <div class="modes" aria-label="Timer mode">
+            <button type="button" data-mode="focus" aria-pressed="true">
+              Focus · 25m
+            </button>
+            <button type="button" data-mode="break" aria-pressed="false">
+              Break · 5m
+            </button>
+          </div>
+
+          <div class="clock">
+            <div id="time" role="timer" aria-label="Time remaining">25:00</div>
+            <div id="timer-status" role="status">Ready when you are</div>
+          </div>
+
+          <div class="actions">
+            <button id="start" class="primary" type="button">Start focus</button>
+            <button id="reset" type="button">Reset</button>
+          </div>
+
+          <p class="timer-note">A little focus goes a long way.</p>
+        </section>
+
+        <section class="card" aria-labelledby="tasks-heading">
+          <div class="heading">
+            <h2 id="tasks-heading">Your next moves</h2>
+            <span id="task-count" class="tag">0 tasks</span>
+          </div>
+
+          <form id="task-form">
+            <label class="sr-only" for="task-input">New task</label>
+            <input id="task-input" type="text" maxlength="160"
+                   placeholder="What do you want to accomplish?"
+                   autocomplete="off" required>
+            <button class="primary" type="submit">Add</button>
+          </form>
+
+          <ul id="tasks"></ul>
+
+          <div class="progress-label">
+            <span>Completion</span>
+            <span id="progress-text" aria-live="polite">0 of 0</span>
+          </div>
+          <progress id="progress" max="100" value="0"
+                    aria-label="Task completion"></progress>
+
+          <p id="storage-status" role="status" class="timer-note">
+            Tasks are saved in this browser.
+          </p>
+        </section>
+      </div>
+
+      <aside class="tip">
+        <strong>A small experiment:</strong>
+        Choose one task, silence your notifications, and give it 25 minutes.
+        You only need to begin.
+      </aside>
+    </main>
+
+    <footer>ORBIT / Built for steady progress.</footer>
+  </div>
+
+  <script>
+    const $ = selector => document.querySelector(selector);
+    const TASK_KEY = "orbit.tasks.v1";
+    const THEME_KEY = "orbit.theme.v1";
+
+    let tasks = [];
+
+    function saveTasks() {
+      try {
+        localStorage.setItem(TASK_KEY, JSON.stringify(tasks));
+        $("#storage-status").textContent = "Tasks are saved in this browser.";
+      } catch {
+        $("#storage-status").textContent =
+          "Storage is unavailable. Tasks will last for this page session.";
+      }
+    }
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(TASK_KEY) || "[]");
+      if (Array.isArray(saved)) {
+        tasks = saved
+          .filter(task =>
+            task && typeof task.id === "string" &&
+            typeof task.text === "string" &&
+            typeof task.done === "boolean"
+          )
+          .map(task => ({ ...task, text: task.text.slice(0, 160) }));
+      }
+    } catch {
+      $("#storage-status").textContent =
+        "Saved tasks could not be loaded. You can start a new list.";
+    }
+
+    function renderTasks() {
+      const list = $("#tasks");
+      list.replaceChildren();
+
+      if (tasks.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "empty";
+        empty.textContent = "A fresh start. Add your first task above.";
+        list.append(empty);
+      }
+
+      tasks.forEach(task => {
+        const item = document.createElement("li");
+        item.className = `task${task.done ? " done" : ""}`;
+
+        const label = document.createElement("label");
+        label.className = "task-main";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = task.done;
+        checkbox.addEventListener("change", () => {
+          task.done = checkbox.checked;
+          saveTasks();
+          renderTasks();
+        });
+
+        const text = document.createElement("span");
+        text.textContent = task.text;
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "delete";
+        remove.textContent = "×";
+        remove.setAttribute("aria-label", `Delete task: ${task.text}`);
+        remove.addEventListener("click", () => {
+          tasks = tasks.filter(current => current.id !== task.id);
+          saveTasks();
+          renderTasks();
+          $("#task-input").focus();
+        });
+
+        label.append(checkbox, text);
+        item.append(label, remove);
+        list.append(item);
+      });
+
+      const completed = tasks.filter(task => task.done).length;
+      $("#task-count").textContent =
+        `${tasks.length} task${tasks.length === 1 ? "" : "s"}`;
+      $("#progress-text").textContent = `${completed} of ${tasks.length}`;
+      $("#progress").value = tasks.length ? completed / tasks.length * 100 : 0;
+    }
+
+    $("#task-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const input = $("#task-input");
+      const text = input.value.trim();
+      if (!text) return;
+
+      tasks.push({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        text,
+        done: false
+      });
+
+      input.value = "";
+      saveTasks();
+      renderTasks();
+      input.focus();
+    });
+
+    function updateThemeButton() {
+      const light = document.body.classList.contains("light");
+      $("#theme").textContent = light ? "Dark theme" : "Light theme";
+      $("#theme").setAttribute("aria-label",
+        `Switch to ${light ? "dark" : "light"} theme`);
+    }
+
+    try {
+      document.body.classList.toggle("light",
+        localStorage.getItem(THEME_KEY) === "light");
+    } catch {}
+
+    $("#theme").addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      updateThemeButton();
+      try {
+        localStorage.setItem(THEME_KEY,
+          document.body.classList.contains("light") ? "light" : "dark");
+      } catch {}
+    });
+
+    const durations = { focus: 25 * 60, break: 5 * 60 };
+    let mode = "focus";
+    let remaining = durations[mode];
+    let interval = null;
+    let endAt = 0;
+
+    function drawTimer() {
+      const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
+      const seconds = String(remaining % 60).padStart(2, "0");
+      const formatted = `${minutes}:${seconds}`;
+      $("#time").textContent = formatted;
+      document.title = interval !== null
+        ? `${formatted} — Orbit`
+        : "Orbit — Your Focus Desk";
+    }
+
+    function stopTimer() {
+      clearInterval(interval);
+      interval = null;
+    }
+
+    function finishTimer() {
+      stopTimer();
+      remaining = 0;
+      drawTimer();
+      $("#timer-status").textContent =
+        mode === "focus" ? "Session complete. Take a break!" : "Break complete!";
+      $("#start").textContent = "Start again";
+    }
+
+    function tick() {
+      remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+      if (remaining === 0) finishTimer();
+      else drawTimer();
+    }
+
+    $("#start").addEventListener("click", () => {
+      if (interval !== null) {
+        tick();
+        if (interval === null) return;
+        stopTimer();
+        $("#timer-status").textContent = "Paused";
+        $("#start").textContent = "Resume";
+      } else {
+        if (remaining === 0) remaining = durations[mode];
+        endAt = Date.now() + remaining * 1000;
+        interval = setInterval(tick, 250);
+        $("#timer-status").textContent =
+          mode === "focus" ? "You have got this." : "Breathe. Stretch. Recharge.";
+        $("#start").textContent = "Pause";
+      }
+      drawTimer();
+    });
+
+    function resetTimer() {
+      stopTimer();
+      remaining = durations[mode];
+      $("#timer-status").textContent = "Ready when you are";
+      $("#start").textContent = mode === "focus" ? "Start focus" : "Start break";
+      drawTimer();
+    }
+
+    $("#reset").addEventListener("click", resetTimer);
+
+    document.querySelectorAll("[data-mode]").forEach(button => {
+      button.addEventListener("click", () => {
+        mode = button.dataset.mode;
+        document.querySelectorAll("[data-mode]").forEach(option => {
+          option.setAttribute("aria-pressed", String(option === button));
+        });
+        resetTimer();
+      });
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && interval !== null) tick();
+    });
+
+    updateThemeButton();
+    renderTasks();
+    drawTimer();
+  </script>
+</body>
+</html>
